@@ -1,6 +1,7 @@
 #! usr/bin/env python3
 # play.py
 # coded by Saito-Saito-Saito
+# last edited 24 May 2020
 
 from config import *
 import board

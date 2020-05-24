@@ -1,6 +1,7 @@
 #! usr/bin/env/ Python3
 # config.py
 # coded by Saito-Saito-Saito
+# last edited 24 May 2020
 
 import copy
 import random
@@ -177,4 +178,3 @@ if __name__ == "__main__":
         print('---------------------')
     test_board = Board()
     test_board.print()
-    
