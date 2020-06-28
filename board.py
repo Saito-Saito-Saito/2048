@@ -1,180 +1,159 @@
 #! usr/bin/env/ Python3
-# config.py
+# board.py
 # coded by Saito-Saito-Saito
-# last edited 24 May 2020
+# last edited: 28 June 2020
 
-import copy
-import random
-import re
 
 from config import *
+import copy
+import random
+
+
+local_logger = logger_setup(__name__, level=INFO)
+
+
 
 class Board:
-    def appear(self):
-        for i in range(SIZE):
-            if EMPTY in self.board[i]:
-                break
+    def insert(self, *, logger=None):
+        logger = logger or self.logger
+        # searching for empty square
+        emptied = []
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.board[row][col] == EMPTY:
+                    emptied.append([row, col])
+        # when there is no empty square, you cannot insert a number
+        if emptied == []:
+            logger.info('there is no empty square')
+            return FAILED
+        # selecting an empty square randomly
+        target = random.choice(emptied)
+        # inserting 4 if random No < prob4
+        if random.random() < self.prob4:
+            self.board[target[ROW]][target[COL]] = 4
+        else:
+            self.board[target[ROW]][target[COL]] = 2
+        logger.info('target {} <- No. {}'.format(target, self.board[target[ROW]][target[COL]]))
+        return SUCCEEDED
+
+
+    def __init__(self, *, size=DEFAULT_SIZE, board=[], goal=DEFAULT_GOAL, logger=local_logger, prob4=DEFAULT_PROB4):
+        # copying the board
+        self.size = size
+        self.prob4 = prob4
+        self.logger = logger
+        if goal > MAX_GOAL:
+            self.goal = MAX_GOAL
+        else:
+            self.goal = goal
+        if len(board) == self.size:
+            self.board = copy.deepcopy(board)
+        else:
+            self.board = [[EMPTY for col in range(self.size)] for row in range(self.size)]
+            self.insert(logger=logger)
+            self.insert(logger=logger)
+        logger.debug('in {}, board is {}'.format(self, self.board))
+
+
+    # checking whether index is in the board 
+    def isInBoard(self, index:int):
+        if 0 <= index < self.size:
+            return True
         else:
             return False
-        while True:
-            col = random.randint(0, SIZE - 1)
-            row = random.randint(0, SIZE - 1)
-            if self.board[row][col] == EMPTY:
-                # in case 4 appears
-                if random.random() < FOUR_PROBABILITY:
-                    self.board[row][col] = 4
-                    logging.debug('4 appeared at {}, {}'.format(row, col))
-                else:
-                    self.board[row][col] = 2
-                    logging.debug('2 appeared at {}, {}'.format(row, col))
-                return True
-            else:
-                logging.debug('SELECTED THE SAME PLACE')
 
-    def __init__(self, input_board=[], input_goal=DEFAULT_GOAL):
-        if input_goal >= 100000:
-            logging.warning('TOO BIG VALUE of input_goal')
-            input_goal = DEFAULT_GOAL
-        self.goal = input_goal
-        if len(input_board) == SIZE:
-            self.board = copy.deepcopy(input_board)
-        else:
-            self.board = [[EMPTY for col in range(SIZE)] for row in range(SIZE)]
-        self.status = GAME_PRC
-        self.appear()
-        self.appear()
 
     def print(self):
-        # print a border line
-        print(' ', end='')
-        for count in range(SIZE):
+        print('\n-', end='')
+        for row in range(self.size):
             print('--------', end='')
-        # print \n
-        print('')
-        for row in range(SIZE):
+        print('')   # to a new line
+        for row in range(self.size):
             print('|', end='')
-            for col in range(SIZE):
+            for col in range(self.size):
                 if self.board[row][col] == EMPTY:
-                    print('\t', end='|')
+                    print('       |', end='')
                 else:
-                    print(' {}'.format(self.board[row][col]).center(6) + '\t', end='|')
-            # print \n
-            print('\n ', end='')
-            for count in range(SIZE):
+                    print(' {} '.format(self.board[row][col]).center(7) + '|', end='')
+            print('\n-', end='')  # to new line
+            for col in range(self.size):
                 print('--------', end='')
-            # print \n
-            print('')
+            print('')  # to a new line
+        print('')   # to a new line
+        return SUCCEEDED
 
-    def setcheck(self):
-        # goal
-        for row in range(SIZE):
-            for col in range(SIZE):    
-                if self.board[row][col] >= self.goal:
-                    logging.info('GOAL at {}, {}'.format(row, col))
-                    self.status = GAME_CLR
-                    return GAME_CLR
-        # no way to move
-        subboard = Board(self.board, self.goal)
-        if subboard.move(UP) == subboard.move(DOWN) == subboard.move(LEFT) == subboard.move(RIGHT) != SUCCEEDED:
-            self.status = GAME_OVR
-            return GAME_OVR
-        # reaching here, it's not goal
-        return GAME_PRC
 
-    def move(self, direction):
+    def move(self, direction: list, *, logger=None):
+        logger = logger or self.logger
         ever_moved = False
-        # up
-        if direction == UP:
-            for col in range(SIZE):
-                for row in range(SIZE):
-                    ever_added = False
-                    for focused_row in range(row + 1, SIZE):
-                        # if there is no number at [row,col]
-                        if self.board[row][col] == EMPTY != self.board[focused_row][col]:
-                            self.board[row][col] = self.board[focused_row][col]
-                            self.board[focused_row][col] = EMPTY
-                            ever_moved = True
-                        # if root = focused
-                        elif self.board[row][col] == self.board[focused_row][col] != EMPTY and ever_added == False:
-                            self.board[row][col] *= 2
-                            self.board[focused_row][col] = EMPTY
-                            ever_added = True
-                            ever_moved = True
-                        # if there is another number at focused
-                        elif self.board[row][col] != self.board[focused_row][col] != EMPTY:
-                            break
-            return ever_moved
-        # down
-        elif direction == DOWN:
-            for col in range(SIZE):
-                for row in range(SIZE - 1, 0 - 1, -1):
-                    ever_added = False
-                    for focused_row in range(row - 1, 0 - 1, -1):
-                        # if there is no number at [row, col]
-                        if self.board[row][col] == EMPTY != self.board[focused_row][col]:
-                            self.board[row][col] = self.board[focused_row][col]
-                            self.board[focused_row][col] = EMPTY
-                            ever_moved = True
-                        # if root = focused
-                        elif self.board[row][col] == self.board[focused_row][col] != EMPTY and ever_added == False:
-                            self.board[row][col] *= 2
-                            self.board[focused_row][col] = EMPTY
-                            ever_moved = True
-                            ever_added = True
-                        # if there is another number at focused
-                        elif self.board[row][col] != self.board[focused_row][col] != EMPTY:
-                            break
-            return ever_moved
-        # left               
-        elif direction == LEFT:
-            for row in range(SIZE):
-                for col in range(SIZE):
-                    ever_added = False
-                    for focused_col in range(col + 1, SIZE):
-                        # if there is no number at [row,col]
-                        if self.board[row][col] == EMPTY != self.board[row][focused_col]:
-                            self.board[row][col] = self.board[row][focused_col]
-                            self.board[row][focused_col] = EMPTY
-                            ever_moved = True
-                        # if root = focused
-                        elif self.board[row][col] == self.board[row][focused_col] != EMPTY and ever_added == False:
-                            self.board[row][col] *= 2
-                            self.board[row][focused_col] = EMPTY
-                            ever_moved = True
-                            ever_added = True
-                        # if there is another number at focused
-                        elif self.board[row][col] != self.board[row][focused_col] != EMPTY:
-                            break
-            return ever_moved
-        # right
-        elif direction == RIGHT:
-            for row in range(SIZE):
-                for col in range(SIZE - 1, 0 - 1, -1):
-                    ever_added = False
-                    for focused_col in range(col - 1, 0 - 1, -1):
-                        # if there is no number at [row,col]
-                        if self.board[row][col] == EMPTY != self.board[row][focused_col]:
-                            self.board[row][col] = self.board[row][focused_col]
-                            self.board[row][focused_col] = EMPTY
-                            ever_moved = True
-                        # if root = focused
-                        elif self.board[row][col] == self.board[row][focused_col] != EMPTY and ever_added == False:
-                            self.board[row][col] *= 2
-                            self.board[row][focused_col] = EMPTY
-                            ever_moved = True
-                            ever_added = True
-                            # if there is another number at focused
-                        elif self.board[row][col] != self.board[row][focused_col] != EMPTY:
-                            break
-            return ever_moved
-        # invalid direction
-        else:
-            logging.critical('UNEXPECTED VALUE of DIRECTION at move')
-            return ERROR
+        start = [0, self.size - 1]  # UP&LEFT: 0,  DOWN&RIGHT: size - 1
+        step = [1, -1]  # UP&LEFT: 1,  DOWN&RIGHT: -1
+        stop = [self.size, -1]  # UP&LEFT: size,  DOWN&RIGHT: -1
+        switch = (direction in [DOWN, RIGHT])   # UP&LEFT: False,  DOWN&RIGHT: True
         
+        # cf. move.py and https://Saito-Saito-Saito.github.io/2048/stage5
+        root = [0, 0]
+        for root[COL] in range(start[switch], stop[switch], step[switch]):
+            for root[ROW] in range(start[switch], stop[switch], step[switch]):
+                focused = [root[ROW] - direction[ROW], root[COL] - direction[COL]]
+                while self.isInBoard(focused[ROW]) and self.isInBoard(focused[COL]):
+                    # in case root == EMPTY
+                    if self.board[root[ROW]][root[COL]] == EMPTY != self.board[focused[ROW]][focused[COL]]:
+                        logger.info('{}, {} <- {}'.format(root[ROW], root[COL], self.board[focused[ROW]][focused[COL]]))
+                        self.board[root[ROW]][root[COL]] = self.board[focused[ROW]][focused[COL]]
+                        self.board[focused[ROW]][focused[COL]] = EMPTY
+                        ever_moved = True
+                    # in case root == focused != EMPTY
+                    elif self.board[root[ROW]][root[COL]] == self.board[focused[ROW]][focused[COL]] != EMPTY:
+                        logger.info('{}, {} <- {}'.format(root[ROW], root[COL], self.board[focused[ROW]][focused[COL]]))
+                        self.board[root[ROW]][root[COL]] *= 2
+                        self.board[focused[ROW]][focused[COL]] = EMPTY
+                        ever_moved = True
+                        break
+                    # in case EMPTY != root != focuseed != EMPTY
+                    elif self.board[focused[ROW]][focused[COL]] != EMPTY:
+                        break
+                    # either is zero
+                    focused[ROW] -= direction[ROW]
+                    focused[COL] -= direction[COL]
 
-if __name__ == "__main__":
-    for i in range(16):
-        print('---------------------')
-    test_board = Board()
+        if ever_moved == True:
+            return SUCCEEDED
+        else:
+            # if no number was moved, it is game over
+            logger.debug('ever_moved == False')
+            return FAILED
+
+
+    def isGoal(self, *, logger=None):
+        logger = logger or self.logger
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.board[row][col] >= self.goal:
+                    logger.info('{} is goaled'.format([row, col]))
+                    return True
+        # there is no goaled square
+        return False
+
+
+    def isOver(self, *, logger=None):
+        logger = logger or self.logger
+        local_board = Board(size=self.size, board=self.board, goal=self.goal, logger=self.logger, prob4=self.prob4)
+        for direction in [UP, DOWN, LEFT, RIGHT]:
+            if local_board.move(direction):
+                logger.info('direction {} is available'.format(direction))
+                return False
+        # here, no move is available
+        return True
+
+
+
+if __name__ == "__main__":    
+    test_board = Board(logger=local_logger)
+    test_board.print()
+    # for count in range(16):
+    #     test_board.move(random.choice([UP, DOWN, LEFT, RIGHT]))
+    #     test_board.print()
+    test_board.move(random.choice([UP, DOWN, LEFT, RIGHT]))
+    test_board.insert()
     test_board.print()

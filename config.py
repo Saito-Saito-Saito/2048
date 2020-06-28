@@ -1,35 +1,78 @@
-#! usr/bin/env/ python3
+#! usr/bin/env/ Python3
 # config.py
 # coded by Saito-Saito-Saito
-# last edited 24 May 2020
+# last edited: 28 June 2020
 
-import logging
 
-logging.basicConfig(level=logging.CRITICAL, format='%(filename)s - %(lineno)d - %(levelname)s - %(message)s')
 
-# board size = SIZE * SIZE
-SIZE = 4
+from logging import getLogger, Formatter, StreamHandler, FileHandler, DEBUG, INFO, WARNING, ERROR, CRITICAL
 
-# if the square has no number, record as 0
+
+
+### LOG SET UP
+DEFAULT_LOG_FILE_NAME = 'log.txt'
+DEFAULT_LOG_FORMAT = Formatter('%(asctime)s - %(levelname)s -　logger:%(name)s - %(filename)s - L%(lineno)d - %(funcName)s - %(message)s')
+
+# file handler
+DEFAULT_FHANDLER = FileHandler(DEFAULT_LOG_FILE_NAME, mode='w')
+DEFAULT_FHANDLER.setFormatter(DEFAULT_LOG_FORMAT)
+DEFAULT_FHANDLER.setLevel(DEBUG)
+# stream handler
+DEFAULT_SHANDLER = StreamHandler()
+DEFAULT_SHANDLER.setFormatter(DEFAULT_LOG_FORMAT)
+DEFAULT_SHANDLER.setLevel(WARNING)
+
+# set up function
+def logger_setup(logger_name='default', level=DEBUG, *, fhandler=None, fhandler_level=DEBUG, filename=DEFAULT_LOG_FILE_NAME, filemode='w', fileformat=DEFAULT_LOG_FORMAT, shandler=None, shandler_level=WARNING, streamformat=DEFAULT_LOG_FORMAT):
+    logger = getLogger(logger_name)
+    logger.setLevel(level)
+    
+    # file handler
+    fhandler = fhandler or FileHandler(filename, mode=filemode)
+    fhandler.setLevel(fhandler_level)
+    fhandler.setFormatter(fileformat)
+    logger.addHandler(fhandler)
+    
+    # stream handler
+    shandler = shandler or StreamHandler()
+    shandler.setLevel(shandler_level)
+    shandler.setFormatter(streamformat)
+    logger.addHandler(shandler)
+    
+    return logger
+
+
+
+### INDEXES
+ROW = 0
+COL = 1
+
+
+
+### SQUARES STATUS
 EMPTY = 0
 
-# directions
-UP = 1
-DOWN = 2
-LEFT = 3
-RIGHT = 4
 
-# the probability of appearing 4
-FOUR_PROBABILITY = 1 / 8
 
-# game status
-GAME_PRC = 0
-GAME_CLR = 1
-GAME_OVR = -1
+### DIRECTIONS
+UP = [-1, 0]
+DOWN = [+1, 0]
+LEFT = [0, -1]
+RIGHT = [0, +1]
 
-DEFAULT_GOAL = 32
 
-# for return
+
+### RETURN VALUES
 SUCCEEDED = True
 FAILED = False
-ERROR = -1
+
+
+
+### DEFAULT VALUES
+DEFAULT_PROB4 = 1 / 8
+DEFAULT_SIZE = 4  # board size = 4 * 4
+DEFAULT_GOAL = 2048
+MAX_GOAL = 65536
+
+
+
