@@ -1,7 +1,7 @@
 #! usr/bin/env/ Python3
 # move.py
 # coded by Saito-Saito-Saito
-# last edited: 28 June 2020
+# last edited: 15 August 2020
 # CAUTION: THIS CODE IS ONLY FOR MEMORANDOM OF move METHOD. YOU CAN RUN main.py WITHOUT THIS MODULE.
 
 
@@ -62,7 +62,7 @@ class Move(board.Board):
                             break
                         focused[ROW] -= 1
         elif direction == LEFT:
-            logger.debug('direction is UP')
+            logger.debug('direction is LEFT')
             root = [0, 0]
             for root[ROW] in range(self.size):
                 for root[COL] in range(self.size):
@@ -85,7 +85,7 @@ class Move(board.Board):
                             break
                         focused[COL] += 1
         elif direction == RIGHT:
-            logger.debug('direction is UP')
+            logger.debug('direction is RIGHT')
             root = [0, 0]
             for root[ROW] in range(self.size):
                 for root[COL] in range(self.size - 1, -1, -1):
