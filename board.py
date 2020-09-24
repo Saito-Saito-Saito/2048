@@ -1,7 +1,8 @@
 #! usr/bin/env/ Python3
 # board.py
 # coded by Saito-Saito-Saito
-# last edited: 28 June 2020
+# last edited: 25 September 2020
+# explained on https://Saito-Saito-Saito.github.io/2048
 
 
 from config import *
@@ -16,29 +17,34 @@ local_logger = logger_setup(__name__, level=INFO)
 class Board:
     def insert(self, *, logger=None):
         logger = logger or self.logger
+
         # searching for empty square
         emptied = []
         for row in range(self.size):
             for col in range(self.size):
                 if self.board[row][col] == EMPTY:
                     emptied.append([row, col])
+
         # when there is no empty square, you cannot insert a number
         if emptied == []:
             logger.info('there is no empty square')
             return FAILED
+
         # selecting an empty square randomly
         target = random.choice(emptied)
+
         # inserting 4 if random No < prob4
         if random.random() < self.prob4:
             self.board[target[ROW]][target[COL]] = 4
         else:
             self.board[target[ROW]][target[COL]] = 2
+
         logger.info('target {} <- No. {}'.format(target, self.board[target[ROW]][target[COL]]))
         return SUCCEEDED
 
 
     def __init__(self, *, size=DEFAULT_SIZE, board=[], goal=DEFAULT_GOAL, logger=local_logger, prob4=DEFAULT_PROB4):
-        # copying the board
+        # copying the parameters
         self.size = size
         self.prob4 = prob4
         self.logger = logger
@@ -46,12 +52,15 @@ class Board:
             self.goal = MAX_GOAL
         else:
             self.goal = goal
+
+        # copying the board
         if len(board) == self.size:
             self.board = copy.deepcopy(board)
         else:
             self.board = [[EMPTY for col in range(self.size)] for row in range(self.size)]
             self.insert(logger=logger)
             self.insert(logger=logger)
+
         logger.debug('in {}, board is {}'.format(self, self.board))
 
 
@@ -91,7 +100,7 @@ class Board:
         stop = [self.size, -1]  # UP&LEFT: size,  DOWN&RIGHT: -1
         switch = (direction in [DOWN, RIGHT])   # UP&LEFT: False,  DOWN&RIGHT: True
         
-        # cf. move.py and https://Saito-Saito-Saito.github.io/2048/stage5
+        # cf. move.py and https://Saito-Saito-Saito.github.io/2048/stage4
         root = [0, 0]
         for root[COL] in range(start[switch], stop[switch], step[switch]):
             for root[ROW] in range(start[switch], stop[switch], step[switch]):

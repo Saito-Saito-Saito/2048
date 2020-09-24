@@ -1,7 +1,8 @@
 #! usr/bin/env/ Python3
 # main.py
 # coded by Saito-Saito-Saito
-# last edited: 28 June 2020
+# last edited: 25 September 2020
+# explained on https://Saito-Saito-Saito.github.io/2048
 
 
 from config import *
@@ -20,7 +21,7 @@ parameters = {'size': DEFAULT_SIZE, 'goal': DEFAULT_GOAL}
 
 
 ### SET UP
-def settings(command: str):
+def settings(command: str): # when command is X, change the parameters
     while command in ['x', 'X']:
         setcommand = input('ENTER THE COMMAND (BOARD SIZE: S,  GOAL: G,  EXIT: E) ---')
         while setcommand in ['s', 'S']:
@@ -52,6 +53,8 @@ def settings(command: str):
  
 def startmenu():
     command = input('''
+2048
+
 SETTINGS
     BOARD SIZE  {} * {}
     GOAL        {}

@@ -1,8 +1,9 @@
 #! usr/bin/env/ Python3
 # move.py
 # coded by Saito-Saito-Saito
-# last edited: 15 August 2020
+# last edited: 25 September 2020
 # CAUTION: THIS CODE IS ONLY FOR MEMORANDOM OF move METHOD. YOU CAN RUN main.py WITHOUT THIS MODULE.
+# explained on https://Saito-Saito-Saito.github.io/2048
 
 
 import board
@@ -28,7 +29,7 @@ class Move(board.Board):
                             self.board[root[ROW]][root[COL]] = self.board[focused[ROW]][focused[COL]]
                             self.board[focused[ROW]][focused[COL]] = EMPTY
                             ever_moved = True
-                        # in case board[root]==board[focused] (!= 0)
+                        # in case board[root] == board[focused] (!= 0)
                         elif self.board[root[ROW]][root[COL]] == self.board[focused[ROW]][focused[COL]] != 0:
                             logger.info('{}, {} <- {}'.format(root[ROW], root[COL], self.board[focused[ROW]][focused[COL]]))
                             self.board[root[ROW]][root[COL]] *= 2
@@ -51,7 +52,7 @@ class Move(board.Board):
                             self.board[root[ROW]][root[COL]] = self.board[focused[ROW]][focused[COL]]
                             self.board[focused[ROW]][focused[COL]] = EMPTY
                             ever_moved = True
-                        # in case board[root]==board[focused] (!= 0)
+                        # in case board[root] == board[focused] (!= 0)
                         elif self.board[root[ROW]][root[COL]] == self.board[focused[ROW]][focused[COL]] != 0:
                             logger.info('{}, {} <- {}'.format(root[ROW], root[COL], self.board[focused[ROW]][focused[COL]]))
                             self.board[root[ROW]][root[COL]] *= 2
@@ -74,7 +75,7 @@ class Move(board.Board):
                             self.board[root[ROW]][root[COL]] = self.board[focused[ROW]][focused[COL]]
                             self.board[focused[ROW]][focused[COL]] = EMPTY
                             ever_moved = True
-                        # in case board[root]==board[focused] (!= 0)
+                        # in case board[root] == board[focused] (!= 0)
                         elif self.board[root[ROW]][root[COL]] == self.board[focused[ROW]][focused[COL]] != 0:
                             logger.info('{}, {} <- {}'.format(root[ROW], root[COL], self.board[focused[ROW]][focused[COL]]))
                             self.board[root[ROW]][root[COL]] *= 2

@@ -1,7 +1,8 @@
 #! usr/bin/env/ Python3
 # config.py
 # coded by Saito-Saito-Saito
-# last edited: 28 June 2020
+# last edited: 25 September 2020
+# explained on https://Saito-Saito-Saito.github.io/2048
 
 
 
@@ -22,7 +23,7 @@ DEFAULT_SHANDLER = StreamHandler()
 DEFAULT_SHANDLER.setFormatter(DEFAULT_LOG_FORMAT)
 DEFAULT_SHANDLER.setLevel(WARNING)
 
-# set up function
+# logger set up function
 def logger_setup(logger_name='default', level=DEBUG, *, fhandler=None, fhandler_level=DEBUG, filename=DEFAULT_LOG_FILE_NAME, filemode='w', fileformat=DEFAULT_LOG_FORMAT, shandler=None, shandler_level=WARNING, streamformat=DEFAULT_LOG_FORMAT):
     logger = getLogger(logger_name)
     logger.setLevel(level)
